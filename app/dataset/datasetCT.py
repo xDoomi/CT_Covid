@@ -8,7 +8,7 @@ from torchvision.transforms import Compose, ToTensor
 from torchvision.transforms.functional import rotate
 
 
-__all__ = ['DatasetCT, DatasetTrainCT']
+__all__ = ['DatasetCT, DatasetAugmentCT']
 
 
 class DatasetCT(Dataset):
@@ -34,7 +34,7 @@ class DatasetCT(Dataset):
         return (self.transforms(image_norm), self.transforms(mask_norm))
 
 
-class DatasetTrainCT(DatasetCT):
+class DatasetAugmentCT(DatasetCT):
 
     def __init__(self):
         super().__init_()

@@ -1,1 +1,1 @@
-from datasetCT import DatasetCT, DatasetTrainCT
+from datasetCT import DatasetCT, DatasetAugmentCT
