@@ -12,9 +12,6 @@ def iou_mean(predict: torch.Tensor, label: torch.Tensor):
 
 
 def pixel_accuracy(predict: torch.Tensor, label: torch.Tensor):
-    with torch.no_grad():
-        predict = F.softmax(predict, dim=1)[0].squeeze()
-        predict = F.one_hot(predict.argmax(dim=0), 2).permute(2, 0, 1)
-        correct = torch.eq(predict, label).int()
-        accuracy = float(correct.sum()) / float(correct.numel())
+    correct = torch.eq(predict, label).int()
+    accuracy = float(correct.sum()) / float(correct.numel())
     return accuracy

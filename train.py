@@ -44,15 +44,12 @@ def train(model, train_loader, val_loader, criterion, optimizer, cfg):
         iou = 0
         for batch_idx, (data, target) in enumerate(train_loader):
             data = data.to(device, dtype=torch.float32)
-            target = target.to(device, dtype=torch.long)
-            #target = target.squeeze()
+            target = target.to(device, dtype=torch.float32)
             optimizer.zero_grad()
             output = model(data)
-            print(output.size())
-            print(target.size())
-            loss = criterion(output, target) \
-                    + dice_loss(F.softmax(output, dim=1).float(),
-                                F.one_hot(target, model.n_classes).permute(0, 3, 1, 2).float(),
+            loss = criterion(output, torch.argmax(target, dim=1)) \
+                    + dice_loss(F.softmax(output, dim=1),
+                                target,
                                 multiclass=True)
             loss.backward()
             optimizer.step()
@@ -65,15 +62,16 @@ def train(model, train_loader, val_loader, criterion, optimizer, cfg):
         with torch.no_grad():
             for data, target in val_loader:
                 data = data.to(device, dtype=torch.float32)
-                target = target.to(device, dtype=torch.long)
-                target = target.squeeze()
+                target = target.to(device, dtype=torch.float32)
                 output = model(data)
-                loss = criterion(output, target) \
-                    + dice_loss(F.softmax(output, dim=1).float(),
-                                F.one_hot(target, model.n_classes).permute(0, 3, 1, 2).float(),
+                loss = criterion(output, torch.argmax(target, dim=1)) \
+                    + dice_loss(F.softmax(output, dim=1),
+                                target,
                                 multiclass=True)
-                pixel_cor += pixel_accuracy(output, target.unsqueeze(0))
-                iou += iou_mean(output, target.unsqueeze(0)).item()
+                predict = F.softmax(output, dim=1)[0]
+                predict = F.one_hot(predict.argmax(dim=0), cfg['DATASET']['num_classes']).permute(2, 0, 1)
+                pixel_cor += pixel_accuracy(predict, target.squeeze())
+                iou += iou_mean(predict, target.squeeze()).item()
                 val_loss += loss.item()
 
         print('Train average loss: {:.4f}, Validation average loss: {:.4f}'.format(
