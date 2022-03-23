@@ -3,6 +3,9 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 
+__all__ = ['UNet']
+
+
 class DoubleConv(nn.Module):
     """(convolution => [BN] => ReLU) * 2"""
 
