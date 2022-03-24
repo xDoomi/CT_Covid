@@ -1,11 +1,11 @@
-name: train
+name: train-my-model
 on: [push]
 jobs:
-  run:
-    runs-on: [self-hosted,cml,gpu]
+  train:
+    runs-on: [self-hosted, cml, gpu]
     steps:
       - uses: actions/checkout@v2
-      - name: Train model
+      - name: cml_run
         env:
           GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
         run: |
