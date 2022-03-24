@@ -1,0 +1,24 @@
+stages:
+  train:
+    cmd: python train.py
+    deps:
+      - train.py
+    params:
+      - TRAIN.seed
+      - TRAIN.num_epoch
+      - TRAIN.optim
+      - MODEL.name
+    outs:
+      - save/UNet
+      - save/results.txt
+  evaluate_val:
+    cmd: python app/evaluate/eval_val.py
+    deps:
+      - app/evaluate/eval_val.py
+      - save/UNet
+      - save/results.txt
+    outs:
+      - save/val_plot.png
+    metrics:
+      - save/val_metrics.json:
+          cashe: false

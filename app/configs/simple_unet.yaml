@@ -1,0 +1,17 @@
+DATASET:
+  root_dataset: "data/Kaggle_CT/"
+  train_images: 'data/Kaggle_CT/images_radiopedia.npy'
+  train_masks: 'data/Kaggle_CT/masks_radiopedia.npy'
+  val_images: 'data/Kaggle_CT/images_medseg.npy'
+  val_masks: 'data/Kaggle_CT/masks_radiopedia.npy'
+  num_classes: 4
+  num_channels: 1
+
+MODEL:
+  name: 'UNet'
+
+TRAIN:
+  seed: 666
+  num_epoch: 1
+  batch_size: 1
+  optim: "Adam"

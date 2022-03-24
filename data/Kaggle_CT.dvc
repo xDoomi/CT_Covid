@@ -1,0 +1,5 @@
+outs:
+- md5: 7125b0ce1b7f15e9b20db55a864818fe.dir
+  size: 2943353472
+  nfiles: 5
+  path: Kaggle_CT
