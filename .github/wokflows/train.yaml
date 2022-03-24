@@ -7,7 +7,19 @@ jobs:
       - uses: actions/checkout@v2
       - name: Train model
         env:
-          REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
         run: |
           pip install -r requirements.txt
+          dvc pull data --run-cache
           dvc repro
+      - name: Create CML report
+        env:
+          REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git fetch --prune
+          dvc metrics diff --show-md master > report.md
+
+          # Add figure to the report
+          echo "## Validation results"
+          cml-publish save/val_plot.png --md >> report.md
+          cml-send-comment report.md
