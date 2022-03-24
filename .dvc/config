@@ -1,4 +1,4 @@
 [core]
-    remote = remote_storage
-['remote "remote_storage"']
-    url = /home/xdoomi/ML/dvc_remote
+    remote = myremote
+['remote "myremote"']
+    url = gs://sparrow_ai_bucket/CT_Covid

@@ -15,5 +15,3 @@ TRAIN:
   num_epoch: 1
   batch_size: 1
   optim: "Adam"
-
-DIR: "app/save/UNet"

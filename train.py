@@ -1,6 +1,5 @@
 import argparse
 import yaml
-import os
 import random
 import numpy as np
 from datetime import datetime
@@ -89,12 +88,10 @@ def train(model, train_loader, val_loader, criterion, optimizer, cfg):
         epochs_val_iou.append(iou / len(val_loader.dataset))
 
     print("Training complete in: " + str(datetime.now() - start))
-    path_save = Path(cfg['DIR'])
-    if path_save not in Path('app/save').glob('**/*'):
-        path_save.mkdir()
-    torch.save(model.state_dict(), path_save / '{}'.format(val_loss / len(val_loader.dataset)))
-    print('Model saved: {}'.format(val_loss / len(val_loader.dataset)))
-    with open(path_save / '{}.txt'.format(val_loss / len(val_loader.dataset)), 'w') as file:
+    path_save = Path('save')
+    torch.save(model.state_dict(), path_save / '{}'.format(cfg['MODEL']['name']))
+    print('Model saved: {}'.format(cfg['MODEL']['name']))
+    with open(path_save / 'results.txt', 'w') as file:
         print(*epochs_train_ls, sep=',', file=file)
         print(*epochs_val_ls, sep=',', file=file)
         print(*epochs_val_cor, sep=',', file=file)
@@ -124,7 +121,7 @@ def main(cfg):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Train script')
-    parser.add_argument('-cfg', metavar='FILE', type=str, required=True)
+    parser.add_argument('-cfg', metavar='FILE', type=str, default='app/configs/simple_unet.yaml')
 
     args = parser.parse_args()
     
