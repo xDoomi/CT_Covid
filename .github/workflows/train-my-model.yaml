@@ -9,7 +9,6 @@ jobs:
         env:
           GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
         run: |
-          pip install -r requirements.txt
           dvc pull data --run-cache
           dvc repro
       - name: Create CML report
