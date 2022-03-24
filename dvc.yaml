@@ -4,10 +4,11 @@ stages:
     deps:
       - train.py
     params:
-      - TRAIN.seed
-      - TRAIN.num_epoch
-      - TRAIN.optim
-      - MODEL.name
+      - app/configs/simple_unet.yaml:
+        - TRAIN.seed
+        - TRAIN.num_epoch
+        - TRAIN.optim
+        - MODEL.name
     outs:
       - save/UNet
       - save/results.txt
@@ -21,4 +22,4 @@ stages:
       - save/val_plot.png
     metrics:
       - save/val_metrics.json:
-          cashe: false
+          cache: false
