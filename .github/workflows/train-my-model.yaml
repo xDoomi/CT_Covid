@@ -15,8 +15,6 @@ jobs:
         uses: 'google-github-actions/setup-gcloud@v0'
 
       - name: cml_run
-        env:
-          GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
         run: |
           pip install -r requirements.txt
           dvc pull --run-cache
