@@ -4,42 +4,43 @@ on:
     paths-ignore:
       - 'dvc.lock'
       - 'save/**'
-      jobs:
-        train:
-          runs-on: [self-hosted, cml, gpu]
-          steps:
-            - uses: actions/checkout@v2
 
-            - name: 'Authenticate to Google Cloud'
-              uses: 'google-github-actions/auth@v0'
-              with:
-                credentials_json: '${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}'
+jobs:
+  train:
+    runs-on: [self-hosted, cml, gpu]
+    steps:
+      - uses: actions/checkout@v2
 
-            - name: 'Set up Cloud SDK'
-              uses: 'google-github-actions/setup-gcloud@v0'
+      - name: 'Authenticate to Google Cloud'
+        uses: 'google-github-actions/auth@v0'
+        with:
+          credentials_json: '${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}'
 
-            - name: cml_run
-              run: |
-                pip install -r requirements.txt
-                dvc pull
-                dvc repro
+      - name: 'Set up Cloud SDK'
+        uses: 'google-github-actions/setup-gcloud@v0'
 
-                git add save/val_metrics.json
-                git commit -m "save results"
-                git push
-                dvc push
+      - name: cml_run
+        run: |
+          pip install -r requirements.txt
+          dvc pull
+          dvc repro
 
-            - name: Create CML report
-              env:
-                REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-              run: |
-                git fetch --prune
-                dvc metrics diff --show-md main > report.md
+          git add save/val_metrics.json
+          git commit -m "save results"
+          git push
+          dvc push
 
-                echo "## Training metrics" >> report.md        
-                dvc params diff main --show-md >> report.md
+      - name: Create CML report
+        env:
+          REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git fetch --prune
+          dvc metrics diff --show-md main > report.md
 
-                # Add figure to the report
-                echo "## Validation results"
-                cml-publish save/val_plot.png --md >> report.md
-                cml-send-comment report.md
+          echo "## Training metrics" >> report.md        
+          dvc params diff main --show-md >> report.md
+
+          # Add figure to the report
+          echo "## Validation results"
+          cml-publish save/val_plot.png --md >> report.md
+          cml-send-comment report.md
