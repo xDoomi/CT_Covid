@@ -7,10 +7,9 @@ jobs:
       - uses: actions/checkout@v2
       - name: cml_run
         env:
-          GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS_DATA }}
         run: |
           pip install -r requirements.txt
-          gcloud auth login
           dvc pull --run-cache
           dvc repro
       - name: Create CML report
