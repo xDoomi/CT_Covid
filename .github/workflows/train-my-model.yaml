@@ -27,7 +27,7 @@ jobs:
 
           cml ci
           git add save/val_metrics.json
-          git commit --amend
+          git commit -m "save result"
           git push
           dvc push
 
