@@ -19,6 +19,10 @@ jobs:
           pip install -r requirements.txt
           dvc pull
           dvc repro
+
+          git add val_metrics.json
+          git commit -m "save results"
+          git push
           dvc push
 
       - name: Create CML report
