@@ -19,7 +19,7 @@ def main(args):
         epochs_val_cor = list(map(lambda x: float(x) * 100, lines[2].strip().split(',')))
         epochs_val_iou = list(map(lambda x: float(x) * 100, lines[3].strip().split(',')))
 
-    fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(12, 10))
+    fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(16, 10))
     
     epochs = cfg['TRAIN']['num_epoch']
 
