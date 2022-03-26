@@ -25,8 +25,9 @@ jobs:
           dvc pull
           dvc repro
 
+          cml ci
           git add save/val_metrics.json
-          git commit -m "save results"
+          git commit --amend
           git push
           dvc push
 
