@@ -17,8 +17,9 @@ jobs:
       - name: cml_run
         run: |
           pip install -r requirements.txt
-          dvc pull --run-cache
+          dvc pull
           dvc repro
+          dvc push
 
       - name: Create CML report
         env:
@@ -26,6 +27,10 @@ jobs:
         run: |
           git fetch --prune
           dvc metrics diff --show-md main > report.md
+
+          echo "## Training metrics" >> report.md        
+          dvc params diff main --show-md >> report.md
+
           # Add figure to the report
           echo "## Validation results"
           cml-publish save/val_plot.png --md >> report.md
