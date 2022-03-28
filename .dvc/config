@@ -1,4 +1,7 @@
 [core]
     remote = myremote
+    autostage = true
+[cache]
+    dir = /home/runner/shared_cache
 ['remote "myremote"']
     url = gs://sparrow_ai_bucket/CT_Covid

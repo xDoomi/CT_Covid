@@ -110,7 +110,7 @@ def main(cfg):
     val_images, val_masks = load_np(cfg['DATASET']['val_images'], 
                                     cfg['DATASET']['val_masks'])
 
-    train_ds = DatasetCT(train_images[:20], train_masks[:20])
+    train_ds = DatasetCT(train_images, train_masks)
     val_ds = DatasetCT(val_images, val_masks)
     
     train_loader = DataLoader(train_ds, batch_size=cfg['TRAIN']['batch_size'], shuffle=True)
