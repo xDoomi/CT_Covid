@@ -4,6 +4,9 @@ on:
     paths-ignore:
       - 'dvc.lock'
       - 'save/**'
+    branches:
+      - '!main'
+      - '!dev'
 
 jobs:
   train:
@@ -19,17 +22,20 @@ jobs:
       - name: 'Set up Cloud SDK'
         uses: 'google-github-actions/setup-gcloud@v0'
 
-      - name: cml_run
+      - name: 'Download requirements & data'
         run: |
           pip install -r requirements.txt
           dvc pull
+
+      - name: 'Start train'
           dvc repro
           cml ci
           git add save/val_metrics.json
           git commit -m "save result"
           git push
           dvc push
-      - name: Create CML report
+
+      - name: 'Create CML report'
         env:
           REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
