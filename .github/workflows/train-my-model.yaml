@@ -28,6 +28,7 @@ jobs:
           dvc pull
 
       - name: 'Start train'
+        run: |
           dvc repro
           cml ci
           git add save/val_metrics.json
