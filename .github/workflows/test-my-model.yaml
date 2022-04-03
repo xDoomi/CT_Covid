@@ -26,7 +26,8 @@ jobs:
           pip install -r requirements.txt
           dvc pull
 
-      - name: 'Start test'
+      - name: 'Start eval'
+        run: |
           dvc repro -s evaluate_test
           cml ci
           git add save/test_metrics.json
