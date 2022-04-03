@@ -4,6 +4,8 @@ DATASET:
   train_masks: 'data/Kaggle_CT/masks_radiopedia.npy'
   val_images: 'data/Kaggle_CT/images_medseg.npy'
   val_masks: 'data/Kaggle_CT/masks_radiopedia.npy'
+  test_images: 'data/COVID19_1110/test/images.npy'
+  test_masks: 'data/COVID19_1110/test/masks.npy'
   num_classes: 4
   num_channels: 1
 

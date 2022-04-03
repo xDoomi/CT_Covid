@@ -42,7 +42,7 @@ def main(args):
 
     plt.savefig(path_save / 'val_plot.png', format='png')
     with open(path_save / 'val_metrics.json', 'w') as outfile:
-        json.dump({'correct' : epochs_val_cor[-1], 'iou': epochs_val_iou[-1]}, outfile)
+        json.dump({'pixel_correct' : epochs_val_cor[-1], 'iou': epochs_val_iou[-1]}, outfile)
 
 
 if __name__ == '__main__':

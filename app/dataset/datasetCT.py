@@ -1,5 +1,6 @@
 import numpy as np
 import random
+from sklearn import preprocessing
 
 import torch
 import torch.nn.functional as F
@@ -29,8 +30,8 @@ class DatasetCT(Dataset):
         return self.length
 
     def __getitem__(self, index):
-        image_norm = normalize(self.images[index])
-        mask_norm = normalize(self.masks[index])
+        image_norm = preprocessing.normalize(self.images[index])
+        mask_norm = preprocessing.normalize(self.masks[index])
         return (self.transforms(image_norm), self.transforms(mask_norm))
 
 
@@ -45,8 +46,8 @@ class DatasetAugmentCT(DatasetCT):
         ])
 
     def __getitem__(self, index):
-        image_norm = normalize(self.images[index])
-        mask_norm = normalize(self.masks[index])
+        image_norm = preprocessing.normalize(self.images[index])
+        mask_norm = preprocessing.normalize(self.masks[index])
         return self.transforms(image_norm, mask_norm)
 
 
@@ -73,9 +74,3 @@ class myRandomRotation():
     def __call__(self, img, mask):
         angle = float(random.randint(self.min, self.max))
         return rotate(img, angle), rotate(mask, angle)
-
-
-def normalize(soundArr: np.ndarray) -> np.ndarray:
-    mean = np.mean(soundArr)
-    std = np.std(soundArr)
-    return (soundArr - mean) / std

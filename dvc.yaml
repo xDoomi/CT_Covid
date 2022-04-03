@@ -23,3 +23,11 @@ stages:
     metrics:
       - save/val_metrics.json:
           cache: false
+  evaluate_test:
+    cmd: python app/eval_test.py
+    deps:
+      - app/eval_test.py
+      - save/UNet
+    metrics:
+      - save/test_metrics.json:
+          cache: false
