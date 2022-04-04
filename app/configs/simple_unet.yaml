@@ -13,7 +13,7 @@ MODEL:
   name: 'UNet'
 
 TRAIN:
-  seed: 666
-  num_epoch: 30
+  seed: 6666
+  num_epoch: 40
   batch_size: 8
   optim: "Adam"

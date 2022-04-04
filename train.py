@@ -83,7 +83,7 @@ def train(rank, world_size, train_ds, val_ds, cfg):
                 predict = F.softmax(output, dim=1)[0]
                 predict = F.one_hot(predict.argmax(dim=0), cfg['DATASET']['num_classes']).permute(2, 0, 1)
                 pixel_cor += pixel_accuracy(predict, target.squeeze())
-                iou += iou_mean(predict, target.squeeze()).item()
+                iou += iou_mean(predict, target.squeeze(), n_classes)
                 val_loss += loss.item()
 
         if rank == 0:
