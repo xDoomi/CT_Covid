@@ -1,6 +1,5 @@
 import os
 import argparse
-from bleach import clean
 import yaml
 import random
 import numpy as np
@@ -56,8 +55,8 @@ def train(rank, world_size, train_ds, val_ds, cfg):
         iou = 0
         dist.barrier()
         for batch_idx, (data, target) in enumerate(train_loader):
-            data = data.float()
-            target = target.float()
+            data = data.float().to(rank)
+            target = target.float().to(rank)
             optimizer.zero_grad()
             output = ddp_model(data)
             loss = criterion(output, torch.argmax(target, dim=1)) \
@@ -74,8 +73,8 @@ def train(rank, world_size, train_ds, val_ds, cfg):
 
         with torch.no_grad():
             for data, target in val_loader:
-                data = data.float()
-                target = target.float()
+                data = data.float().to(rank)
+                target = target.float().to(rank)
                 output = ddp_model(data)
                 loss = criterion(output, torch.argmax(target, dim=1)) \
                     + dice_loss(F.softmax(output, dim=1),
@@ -135,8 +134,8 @@ def main(cfg, n_gpus):
     val_images, val_masks = load_np(cfg['DATASET']['val_images'], 
                                     cfg['DATASET']['val_masks'])
 
-    train_ds = DatasetCT(train_images, train_masks)
-    val_ds = DatasetCT(val_images, val_masks)
+    train_ds = DatasetCT(np.squeeze(train_images), np.transpose(train_masks, (0, 3, 1, 2)))
+    val_ds = DatasetCT(np.squeeze(val_images), np.transpose(val_masks, (0, 3, 1, 2)))
     
     mp.spawn(train,
         args=(n_gpus, train_ds, val_ds, cfg),

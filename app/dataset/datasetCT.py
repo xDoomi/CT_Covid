@@ -31,8 +31,8 @@ class DatasetCT(Dataset):
 
     def __getitem__(self, index):
         image_norm = preprocessing.normalize(self.images[index])
-        mask_norm = preprocessing.normalize(self.masks[index])
-        return (self.transforms(image_norm), self.transforms(mask_norm))
+        mask = self.masks[index]
+        return (self.transforms(image_norm), torch.from_numpy(mask))
 
 
 class DatasetAugmentCT(DatasetCT):

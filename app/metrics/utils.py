@@ -5,10 +5,11 @@ import torch.nn.functional as F
 __all__ = ['iou_mean', 'iou', 'pixel_accuracy']
 
 
-def iou_mean(predict: torch.Tensor, label: torch.Tensor):
-    overlap = torch.sum(predict * label, dim=(2, 1))
-    union = torch.sum(predict, dim=(2, 1)) + torch.sum(label, dim=(2, 1)) - overlap
-    return torch.mean(overlap / union)
+def iou_mean(predict: torch.Tensor, label: torch.Tensor, n_classes: int):
+    iou_m = 0
+    for i in range(n_classes):
+       iou_m += iou(predict[i], label[i]) 
+    return iou_m / n_classes
 
 
 def iou(predict: torch.Tensor, label: torch.Tensor):
