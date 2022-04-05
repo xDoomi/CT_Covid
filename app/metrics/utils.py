@@ -6,9 +6,9 @@ __all__ = ['iou_mean', 'iou', 'pixel_accuracy']
 
 
 def iou_mean(predict: torch.Tensor, label: torch.Tensor, n_classes: int):
-    iou_m = 0
+    iou_m = 0.
     for i in range(n_classes):
-       iou_m += iou(predict[i], label[i]) 
+       iou_m += iou(predict[i], label[i]).item()
     return iou_m / n_classes
 
 

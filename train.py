@@ -23,40 +23,43 @@ from app.metrics.utils import iou_mean, pixel_accuracy
 
 def train(rank, world_size, train_ds, val_ds, cfg):
     print(f"Running DDP on rank {rank}.")
-    dist.init_process_group('gloo', rank=rank, world_size=world_size)
+    dist.init_process_group('nccl', rank=rank, world_size=world_size)
 
     n_channels = cfg['DATASET']['num_channels']
     n_classes = cfg['DATASET']['num_classes']
     batch_size = cfg['TRAIN']['batch_size']
-    model = UNet(n_channels, n_classes).to(rank)
+
+    torch.cuda.set_device(rank)
+    model = UNet(n_channels, n_classes).cuda(rank)
     ddp_model = DDP(model, device_ids=[rank])
 
     optimizer = optim.Adam(ddp_model.parameters())
-    criterion = nn.CrossEntropyLoss()
+    criterion = nn.CrossEntropyLoss().cuda(rank)
 
-    train_sample = DistributedSampler(train_ds, num_replicas=world_size, rank=rank)
-    val_sample = DistributedSampler(val_ds, num_replicas=world_size, rank=rank)
+    train_sample = DistributedSampler(train_ds)
 
     train_loader = DataLoader(train_ds, batch_size=batch_size, shuffle=False,
-                                num_workers=0, pin_memory=True, sampler=train_sample)
-    val_loader = DataLoader(val_ds, batch_size=1, shuffle=False, num_workers=0, 
-                                pin_memory=True, sampler=val_sample)
+                                num_workers=1, pin_memory=True, sampler=train_sample)
+    val_loader = DataLoader(val_ds, batch_size=1, shuffle=False, num_workers=1, 
+                                pin_memory=True)
 
     log_interval = len(train_ds) // batch_size
     epochs_train_ls, epochs_val_ls = [], []
     epochs_val_cor, epochs_val_iou = [], []
     epochs = cfg['TRAIN']['num_epoch']
-    ddp_model.train()
+
+    dist.barrier()
     start = datetime.now()
     for epoch in range(epochs):
+        train_sample.set_epoch(epoch)
         tr_loss = 0
         val_loss = 0
         pixel_cor = 0
         iou = 0
-        dist.barrier()
+        ddp_model.train()
         for batch_idx, (data, target) in enumerate(train_loader):
-            data = data.float().to(rank)
-            target = target.float().to(rank)
+            data = data.float().cuda(rank, non_blocking=True)
+            target = target.float().cuda(rank, non_blocking=True)
             optimizer.zero_grad()
             output = ddp_model(data)
             loss = criterion(output, torch.argmax(target, dim=1)) \
@@ -71,10 +74,11 @@ def train(rank, world_size, train_ds, val_ds, cfg):
                         epoch, batch_idx * len(data), len(train_loader.dataset),
                         100. * batch_idx / len(train_loader), loss.data))
 
+        ddp_model.eval()
         with torch.no_grad():
             for data, target in val_loader:
-                data = data.float().to(rank)
-                target = target.float().to(rank)
+                data = data.float().cuda(rank, non_blocking=True)
+                target = target.float().cuda(rank, non_blocking=True)
                 output = ddp_model(data)
                 loss = criterion(output, torch.argmax(target, dim=1)) \
                     + dice_loss(F.softmax(output, dim=1),
