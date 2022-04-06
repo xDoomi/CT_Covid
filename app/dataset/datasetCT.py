@@ -3,10 +3,9 @@ import random
 from sklearn import preprocessing
 
 import torch
-import torch.nn.functional as F
 from torch.utils.data import Dataset
 from torchvision.transforms import Compose, ToTensor
-from torchvision.transforms.functional import rotate
+from torchvision.transforms.functional import rotate, to_tensor
 
 
 __all__ = ['DatasetCT, DatasetAugmentCT']
@@ -45,8 +44,11 @@ class DatasetCT(Dataset):
 
 class DatasetAugmentCT(DatasetCT):
 
-    def __init__(self):
-        super().__init_()
+    def __init__(self,
+            images: np.ndarray,
+            masks: np.ndarray,
+            concatenate_class: bool = False):
+        super(DatasetAugmentCT, self).__init__(images, masks, concatenate_class)
 
         self.transforms = myCompose([
             myToTensor(),
@@ -56,7 +58,7 @@ class DatasetAugmentCT(DatasetCT):
     def __getitem__(self, index):
         image_norm = preprocessing.normalize(self.images[index])
         mask = self.masks[index]
-        return self.transforms(image_norm, torch.from_numpy(mask))
+        return self.transforms(image_norm, mask)
 
 
 class myCompose():
@@ -71,14 +73,13 @@ class myCompose():
 
 class myToTensor():
     def __call__(sefl, img, mask):
-        return F.to_tensor(img), F.to_tensor(mask)
+        return to_tensor(img), torch.from_numpy(mask)
 
 
 class myRandomRotation():
-    def __init__(self, min: int = 10, max: int = 180):
-        self.min = min
-        self.max = max
+    def __init__(self):
+        self.angle = [90., 180., 270.]
 
     def __call__(self, img, mask):
-        angle = float(random.randint(self.min, self.max))
+        angle = self.angle[random.randrange(0, 3)]
         return rotate(img, angle), rotate(mask, angle)

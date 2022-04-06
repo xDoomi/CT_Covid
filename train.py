@@ -16,7 +16,7 @@ from torch.utils.data import DataLoader, DistributedSampler
 from torch.nn.parallel import DistributedDataParallel as DDP
 
 from app.models.simple_unet import UNet
-from app.dataset.datasetCT import DatasetCT
+from app.dataset.datasetCT import DatasetCT, DatasetAugmentCT
 from app.metrics.dice_score import dice_loss
 from app.metrics.utils import iou_mean, pixel_accuracy
 
@@ -92,7 +92,7 @@ def train(rank, world_size, train_ds, val_ds, cfg):
 
         if rank == 0:
             print('Train average loss: {:.4f}, Validation average loss: {:.4f}'.format(
-                cfg['TRAIN']['batch_size'] * tr_loss / len(train_loader.dataset),
+                batch_size * cfg['TRAIN']['batch_size'] * tr_loss / len(train_loader.dataset),
                 val_loss / len(val_loader.dataset)
             ))
             print('Validation pixel correct: {:.2f}, Validation IoU mean: {:.2f}'.format(
@@ -141,10 +141,13 @@ def main(cfg, n_gpus):
     concatenate_class = cfg['DATASET']['concatenate_class']
 
     train_ds = DatasetCT(np.squeeze(train_images), train_masks, concatenate_class)
+    train_ds_augment = DatasetAugmentCT(np.squeeze(train_images), train_masks, concatenate_class)
+    train_ds_all = train_ds + train_ds_augment
+
     val_ds = DatasetCT(np.squeeze(val_images), val_masks, concatenate_class)
     
     mp.spawn(train,
-        args=(n_gpus, train_ds, val_ds, cfg),
+        args=(n_gpus, train_ds_all, val_ds, cfg),
         nprocs=n_gpus,
         join=True)
 
