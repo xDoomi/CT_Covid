@@ -21,7 +21,7 @@ from app.metrics.dice_score import dice_loss
 from app.metrics.utils import iou_mean, pixel_accuracy
 
 
-def train(rank, world_size, train_ds, val_ds, cfg):
+def train(rank, world_size, train_ds_all, val_ds, cfg):
     print(f"Running DDP on rank {rank}.")
     dist.init_process_group('nccl', rank=rank, world_size=world_size)
 
@@ -36,14 +36,14 @@ def train(rank, world_size, train_ds, val_ds, cfg):
     optimizer = optim.Adam(ddp_model.parameters())
     criterion = nn.CrossEntropyLoss().cuda(rank)
 
-    train_sample = DistributedSampler(train_ds)
+    train_sample = DistributedSampler(train_ds_all)
 
-    train_loader = DataLoader(train_ds, batch_size=batch_size, shuffle=False,
-                                num_workers=1, pin_memory=True, sampler=train_sample)
-    val_loader = DataLoader(val_ds, batch_size=1, shuffle=False, num_workers=1, 
+    train_loader = DataLoader(train_ds_all, batch_size=batch_size, shuffle=False,
+                                num_workers=0, pin_memory=True, sampler=train_sample)
+    val_loader = DataLoader(val_ds, batch_size=1, shuffle=False, num_workers=0, 
                                 pin_memory=True)
 
-    log_interval = len(train_ds) // batch_size
+    log_interval = len(train_ds_all) // batch_size
     epochs_train_ls, epochs_val_ls = [], []
     epochs_val_cor, epochs_val_iou = [], []
     epochs = cfg['TRAIN']['num_epoch']
