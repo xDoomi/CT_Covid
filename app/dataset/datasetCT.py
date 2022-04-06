@@ -16,12 +16,20 @@ class DatasetCT(Dataset):
     
     def __init__(self,
                 images: np.ndarray,
-                masks: np.ndarray):
+                masks: np.ndarray,
+                concatenate_class: bool = False):
         super().__init__()
 
         self.length = len(images)
         self.images = images
-        self.masks = masks
+        self.concatenate_class = concatenate_class
+
+        if self.concatenate_class:
+            masks = np.stack((masks[..., 0] + masks[..., 1], masks[..., 2], masks[..., 3]))
+            self.masks = np.transpose(masks, (1, 0, 2, 3))
+        else:
+            self.masks = np.transpose(masks, (0, 3, 1, 2))
+
         self.transforms = Compose([
             ToTensor()
         ])
@@ -47,8 +55,8 @@ class DatasetAugmentCT(DatasetCT):
 
     def __getitem__(self, index):
         image_norm = preprocessing.normalize(self.images[index])
-        mask_norm = preprocessing.normalize(self.masks[index])
-        return self.transforms(image_norm, mask_norm)
+        mask = self.masks[index]
+        return self.transforms(image_norm, torch.from_numpy(mask))
 
 
 class myCompose():

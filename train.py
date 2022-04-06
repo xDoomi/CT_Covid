@@ -27,7 +27,7 @@ def train(rank, world_size, train_ds, val_ds, cfg):
 
     n_channels = cfg['DATASET']['num_channels']
     n_classes = cfg['DATASET']['num_classes']
-    batch_size = cfg['TRAIN']['batch_size']
+    batch_size = int(cfg['TRAIN']['batch_size'] / world_size)
 
     torch.cuda.set_device(rank)
     model = UNet(n_channels, n_classes).cuda(rank)
@@ -138,8 +138,10 @@ def main(cfg, n_gpus):
     val_images, val_masks = load_np(cfg['DATASET']['val_images'], 
                                     cfg['DATASET']['val_masks'])
 
-    train_ds = DatasetCT(np.squeeze(train_images), np.transpose(train_masks, (0, 3, 1, 2)))
-    val_ds = DatasetCT(np.squeeze(val_images), np.transpose(val_masks, (0, 3, 1, 2)))
+    concatenate_class = cfg['DATASET']['concatenate_class']
+
+    train_ds = DatasetCT(np.squeeze(train_images), train_masks, concatenate_class)
+    val_ds = DatasetCT(np.squeeze(val_images), val_masks, concatenate_class)
     
     mp.spawn(train,
         args=(n_gpus, train_ds, val_ds, cfg),

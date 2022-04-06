@@ -6,14 +6,15 @@ DATASET:
   val_masks: 'data/Kaggle_CT/masks_radiopedia.npy'
   test_images: 'data/COVID19_1110/test/images.npy'
   test_masks: 'data/COVID19_1110/test/masks.npy'
-  num_classes: 4
+  num_classes: 3
   num_channels: 1
+  concatenate_class: True
 
 MODEL:
   name: 'UNet'
 
 TRAIN:
-  seed: 6666
-  num_epoch: 40
+  seed: 666
+  num_epoch: 30
   batch_size: 8
   optim: "Adam"
