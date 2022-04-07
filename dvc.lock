@@ -42,12 +42,12 @@ stages:
     cmd: python app/eval_test.py
     deps:
     - path: app/eval_test.py
-      md5: 4afbc865ad390e7e79abe88b9a13676f
-      size: 2354
+      md5: bf80a1fb91732b5e133bbe4e587eb311
+      size: 2357
     - path: save/UNet
-      md5: 2d332860bde4ef8f4ed427093f002ad6
-      size: 124235413
+      md5: 67efebaa39652ff97afeaa938b78ccd4
+      size: 124236693
     outs:
     - path: save/test_metrics.json
-      md5: b18d66bbfbf4c93a52dd906c360fb2a3
-      size: 49
+      md5: 5b8a11350f5edfca6a7aea0ad323d6cb
+      size: 66
