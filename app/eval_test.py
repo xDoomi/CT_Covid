@@ -43,12 +43,12 @@ def main(args, device):
     n_classes = cfg['DATASET']['num_classes']
 
     model_ddp = UNet(n_channels, n_classes).to(device)
-    #model_ddp = DataParallel(model)
+    model_ddp = DataParallel(model_ddp)
     model_ddp.load_state_dict(torch.load(path_save / cfg['MODEL']['name'], map_location=device))
 
     test_images, test_masks = load_np(cfg['DATASET']['test_images'], 
                                         cfg['DATASET']['test_masks'])
-    test_ds = DatasetCT(test_images, test_masks)
+    test_ds = DatasetCT(test_images, test_masks, test=True)
     iou_metrics = 0
     pixel_correct = 0
 
@@ -56,7 +56,7 @@ def main(args, device):
         temp = test_ds[i]
         img, target = temp[0], temp[1]
         mask = predict(model_ddp, img, device, n_classes)
-        conc_mask = mask[0] * mask[1] 
+        conc_mask = mask[0]
         pixel_correct += pixel_accuracy(conc_mask, target.squeeze())
         iou_metrics += iou(conc_mask, target.squeeze()).item()
 

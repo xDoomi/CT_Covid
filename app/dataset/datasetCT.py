@@ -16,7 +16,8 @@ class DatasetCT(Dataset):
     def __init__(self,
                 images: np.ndarray,
                 masks: np.ndarray,
-                concatenate_class: bool = False):
+                concatenate_class: bool = False,
+                test: bool = False):
         super().__init__()
 
         self.length = len(images)
@@ -26,6 +27,8 @@ class DatasetCT(Dataset):
         if self.concatenate_class:
             masks = np.stack((masks[..., 0] + masks[..., 1], masks[..., 2], masks[..., 3]))
             self.masks = np.transpose(masks, (1, 0, 2, 3))
+        elif test:
+            self.masks = masks
         else:
             self.masks = np.transpose(masks, (0, 3, 1, 2))
 
