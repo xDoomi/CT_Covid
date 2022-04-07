@@ -1,6 +1,5 @@
 import os
 import argparse
-from bleach import clean
 import yaml
 import random
 import numpy as np
@@ -17,47 +16,50 @@ from torch.utils.data import DataLoader, DistributedSampler
 from torch.nn.parallel import DistributedDataParallel as DDP
 
 from app.models.simple_unet import UNet
-from app.dataset.datasetCT import DatasetCT
+from app.dataset.datasetCT import DatasetCT, DatasetAugmentCT
 from app.metrics.dice_score import dice_loss
 from app.metrics.utils import iou_mean, pixel_accuracy
 
 
-def train(rank, world_size, train_ds, val_ds, cfg):
+def train(rank, world_size, train_ds_all, val_ds, cfg):
     print(f"Running DDP on rank {rank}.")
-    dist.init_process_group('gloo', rank=rank, world_size=world_size)
+    dist.init_process_group('nccl', rank=rank, world_size=world_size)
 
     n_channels = cfg['DATASET']['num_channels']
     n_classes = cfg['DATASET']['num_classes']
-    batch_size = cfg['TRAIN']['batch_size']
-    model = UNet(n_channels, n_classes).to(rank)
+    batch_size = int(cfg['TRAIN']['batch_size'] / world_size)
+
+    torch.cuda.set_device(rank)
+    model = UNet(n_channels, n_classes).cuda(rank)
     ddp_model = DDP(model, device_ids=[rank])
 
     optimizer = optim.Adam(ddp_model.parameters())
-    criterion = nn.CrossEntropyLoss()
+    criterion = nn.CrossEntropyLoss().cuda(rank)
 
-    train_sample = DistributedSampler(train_ds, num_replicas=world_size, rank=rank)
-    val_sample = DistributedSampler(val_ds, num_replicas=world_size, rank=rank)
+    train_sample = DistributedSampler(train_ds_all)
 
-    train_loader = DataLoader(train_ds, batch_size=batch_size, shuffle=False,
+    train_loader = DataLoader(train_ds_all, batch_size=batch_size, shuffle=False,
                                 num_workers=0, pin_memory=True, sampler=train_sample)
     val_loader = DataLoader(val_ds, batch_size=1, shuffle=False, num_workers=0, 
-                                pin_memory=True, sampler=val_sample)
+                                pin_memory=True)
 
-    log_interval = len(train_ds) // batch_size
+    log_interval = len(train_ds_all) // batch_size
     epochs_train_ls, epochs_val_ls = [], []
     epochs_val_cor, epochs_val_iou = [], []
     epochs = cfg['TRAIN']['num_epoch']
-    ddp_model.train()
+
+    dist.barrier()
     start = datetime.now()
     for epoch in range(epochs):
+        train_sample.set_epoch(epoch)
         tr_loss = 0
         val_loss = 0
         pixel_cor = 0
         iou = 0
-        dist.barrier()
+        ddp_model.train()
         for batch_idx, (data, target) in enumerate(train_loader):
-            data = data.float()
-            target = target.float()
+            data = data.float().cuda(rank, non_blocking=True)
+            target = target.float().cuda(rank, non_blocking=True)
             optimizer.zero_grad()
             output = ddp_model(data)
             loss = criterion(output, torch.argmax(target, dim=1)) \
@@ -72,10 +74,11 @@ def train(rank, world_size, train_ds, val_ds, cfg):
                         epoch, batch_idx * len(data), len(train_loader.dataset),
                         100. * batch_idx / len(train_loader), loss.data))
 
+        ddp_model.eval()
         with torch.no_grad():
             for data, target in val_loader:
-                data = data.float()
-                target = target.float()
+                data = data.float().cuda(rank, non_blocking=True)
+                target = target.float().cuda(rank, non_blocking=True)
                 output = ddp_model(data)
                 loss = criterion(output, torch.argmax(target, dim=1)) \
                     + dice_loss(F.softmax(output, dim=1),
@@ -84,12 +87,12 @@ def train(rank, world_size, train_ds, val_ds, cfg):
                 predict = F.softmax(output, dim=1)[0]
                 predict = F.one_hot(predict.argmax(dim=0), cfg['DATASET']['num_classes']).permute(2, 0, 1)
                 pixel_cor += pixel_accuracy(predict, target.squeeze())
-                iou += iou_mean(predict, target.squeeze()).item()
+                iou += iou_mean(predict, target.squeeze(), n_classes)
                 val_loss += loss.item()
 
         if rank == 0:
             print('Train average loss: {:.4f}, Validation average loss: {:.4f}'.format(
-                cfg['TRAIN']['batch_size'] * tr_loss / len(train_loader.dataset),
+                batch_size * cfg['TRAIN']['batch_size'] * tr_loss / len(train_loader.dataset),
                 val_loss / len(val_loader.dataset)
             ))
             print('Validation pixel correct: {:.2f}, Validation IoU mean: {:.2f}'.format(
@@ -135,11 +138,16 @@ def main(cfg, n_gpus):
     val_images, val_masks = load_np(cfg['DATASET']['val_images'], 
                                     cfg['DATASET']['val_masks'])
 
-    train_ds = DatasetCT(train_images, train_masks)
-    val_ds = DatasetCT(val_images, val_masks)
+    concatenate_class = cfg['DATASET']['concatenate_class']
+
+    train_ds = DatasetCT(np.squeeze(train_images), train_masks, concatenate_class)
+    train_ds_augment = DatasetAugmentCT(np.squeeze(train_images), train_masks, concatenate_class)
+    train_ds_all = train_ds + train_ds_augment
+
+    val_ds = DatasetCT(np.squeeze(val_images), val_masks, concatenate_class)
     
     mp.spawn(train,
-        args=(n_gpus, train_ds, val_ds, cfg),
+        args=(n_gpus, train_ds_all, val_ds, cfg),
         nprocs=n_gpus,
         join=True)
 
@@ -160,5 +168,6 @@ if __name__ == '__main__':
 
     os.environ["MASTER_ADDR"] = 'localhost'
     os.environ["MASTER_PORT"] = '29500'
+    os.environ["NCCL_DEBUG"] = "INFO"
 
     main(cfg, n_gpus)

@@ -4,8 +4,8 @@ stages:
     cmd: python train.py
     deps:
     - path: train.py
-      md5: a7a88700f972d033d0387e6a20993037
-      size: 5334
+      md5: 245c3f63c4188379a6115f462d3afcdb
+      size: 6751
     params:
       app/configs/simple_unet.yaml:
         MODEL.name: UNet
@@ -14,30 +14,30 @@ stages:
         TRAIN.seed: 666
     outs:
     - path: save/UNet
-      md5: 2d332860bde4ef8f4ed427093f002ad6
-      size: 124235413
+      md5: 67efebaa39652ff97afeaa938b78ccd4
+      size: 124236693
     - path: save/results.txt
-      md5: 261e317378f9b9f186ed0a7e120e7103
-      size: 1843
+      md5: f90916eaba1237d606d93ff3a7ae6f76
+      size: 2283
   evaluate_val:
     cmd: python app/evaluate/eval_val.py
     deps:
     - path: app/evaluate/eval_val.py
-      md5: bc887cd3b06808b78c323df9f66f1801
-      size: 1875
+      md5: 922c42dfbb0924c86b5bae3f642a0eb5
+      size: 1881
     - path: save/UNet
-      md5: 2d332860bde4ef8f4ed427093f002ad6
-      size: 124235413
+      md5: 67efebaa39652ff97afeaa938b78ccd4
+      size: 124236693
     - path: save/results.txt
-      md5: 261e317378f9b9f186ed0a7e120e7103
-      size: 1843
+      md5: f90916eaba1237d606d93ff3a7ae6f76
+      size: 2283
     outs:
     - path: save/val_metrics.json
-      md5: c742b6b94b8764627d61690d4a95e375
-      size: 43
+      md5: 0160ac26e20708ef05d191e87ed9fafe
+      size: 63
     - path: save/val_plot.png
-      md5: bd5cc9336c97403c0e159f088da98b53
-      size: 74997
+      md5: 1792be63d1e638f2bf0c927d2fa7a96e
+      size: 67380
   evaluate_test:
     cmd: python app/eval_test.py
     deps:
