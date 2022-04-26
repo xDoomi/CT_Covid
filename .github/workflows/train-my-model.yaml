@@ -29,7 +29,8 @@ jobs:
 
       - name: 'Start train'
         run: |
-          dvc repro evaluate_val
+          dvc repro train
+          dvc repro evaluate_val -s
           cml ci
           git add save/val_metrics.json
           git commit -m "save result"
