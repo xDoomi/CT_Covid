@@ -25,12 +25,12 @@ jobs:
       - name: 'Download requirements & data'
         run: |
           pip install -r requirements.txt
-          dvc pull -q
+          dvc pull data/COVID19_1110
+          dvc pull data/Kaggle_CT
 
       - name: 'Start train'
         run: |
-          dvc repro train
-          dvc repro evaluate_val -s
+          dvc repro evaluate_val
           cml ci
           git add save/val_metrics.json
           git commit -m "save result"
