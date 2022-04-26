@@ -15,7 +15,7 @@ import torch.optim as optim
 from torch.utils.data import DataLoader, DistributedSampler
 from torch.nn.parallel import DistributedDataParallel as DDP
 
-from app.models.simple_unet import UNet
+from segmentation_models_pytorch import Unet
 from app.dataset.datasetCT import DatasetCT, DatasetAugmentCT
 from app.metrics.dice_score import dice_loss
 from app.metrics.utils import iou_mean, pixel_accuracy
@@ -30,7 +30,12 @@ def train(rank, world_size, train_ds_all, val_ds, cfg):
     batch_size = int(cfg['TRAIN']['batch_size'] / world_size)
 
     torch.cuda.set_device(rank)
-    model = UNet(n_channels, n_classes).cuda(rank)
+    model = Unet(
+        encoder_name=cfg['MODEL']['encoder'],
+        encoder_depth=None,
+        in_channels=n_channels,
+        classes=n_classes
+    ).cuda(rank)
     ddp_model = DDP(model, device_ids=[rank])
 
     optimizer = optim.Adam(ddp_model.parameters())
@@ -108,8 +113,12 @@ def train(rank, world_size, train_ds_all, val_ds, cfg):
     if rank == 0:
         print("Training complete in: " + str(datetime.now() - start))
         path_save = Path('save')
-        torch.save(ddp_model.state_dict(), path_save / '{}'.format(cfg['MODEL']['name']))
-        print('Model saved: {}'.format(cfg['MODEL']['name']))
+        torch.save(ddp_model.state_dict(), path_save / '{}_{}'.format(
+            cfg['MODEL']['name'], 
+            cfg['MODEL']['encoder']))
+        print('Model saved: {}_{}'.format(
+            cfg['MODEL']['name'],
+            cfg['MODEL']['encoder']))
         with open(path_save / 'results.txt', 'w') as file:
             print(*epochs_train_ls, sep=',', file=file)
             print(*epochs_val_ls, sep=',', file=file)
@@ -154,7 +163,7 @@ def main(cfg, n_gpus):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Train script')
-    parser.add_argument('-cfg', metavar='FILE', type=str, default='app/configs/simple_unet.yaml')
+    parser.add_argument('-cfg', metavar='FILE', type=str, default='app/configs/unet_resnet.yaml')
 
     args = parser.parse_args()
     

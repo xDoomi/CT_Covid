@@ -9,7 +9,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.nn.parallel import DataParallel
 
-from models.simple_unet import UNet
+from segmentation_models_pytorch import Unet
 from dataset.datasetCT import DatasetCT
 from metrics.utils import iou, pixel_accuracy
 
@@ -42,9 +42,15 @@ def main(args, device):
     n_channels = cfg['DATASET']['num_channels']
     n_classes = cfg['DATASET']['num_classes']
 
-    model_ddp = UNet(n_channels, n_classes).to(device)
+    model_ddp = Unet(
+        encoder_name=cfg['MODEL']['encoder'],
+        encoder_depth=None,
+        in_channels=n_channels,
+        classes=n_classes
+    ).to(device)
     model_ddp = DataParallel(model_ddp)
-    model_ddp.load_state_dict(torch.load(path_save / cfg['MODEL']['name'], map_location=device))
+    name_model = cfg['MODEL']['name'] + '_' + cfg['MODEL']['encoder']
+    model_ddp.load_state_dict(torch.load(path_save / name_model, map_location=device))
 
     test_images, test_masks = load_np(cfg['DATASET']['test_images'], 
                                         cfg['DATASET']['test_masks'])
@@ -66,7 +72,7 @@ def main(args, device):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Test script')
-    parser.add_argument('-cfg', metavar='FILE', type=str, default='app/configs/simple_unet.yaml')
+    parser.add_argument('-cfg', metavar='FILE', type=str, default='app/configs/unet_resnet.yaml')
     args = parser.parse_args()
 
     if torch.cuda.is_available():
