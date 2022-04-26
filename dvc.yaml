@@ -4,11 +4,12 @@ stages:
     deps:
       - train.py
     params:
-      - app/configs/simple_unet.yaml:
+      - app/configs/unet_resnet.yaml:
         - TRAIN.seed
         - TRAIN.num_epoch
         - TRAIN.optim
         - MODEL.name
+        - MODEL.encoder
     outs:
       - save/UNet
       - save/results.txt
