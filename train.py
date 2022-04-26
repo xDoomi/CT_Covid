@@ -32,7 +32,7 @@ def train(rank, world_size, train_ds_all, val_ds, cfg):
     torch.cuda.set_device(rank)
     model = Unet(
         encoder_name=cfg['MODEL']['encoder'],
-        encoder_depth=None,
+        encoder_weights=None,
         in_channels=n_channels,
         classes=n_classes
     ).cuda(rank)
@@ -113,12 +113,8 @@ def train(rank, world_size, train_ds_all, val_ds, cfg):
     if rank == 0:
         print("Training complete in: " + str(datetime.now() - start))
         path_save = Path('save')
-        torch.save(ddp_model.state_dict(), path_save / '{}_{}'.format(
-            cfg['MODEL']['name'], 
-            cfg['MODEL']['encoder']))
-        print('Model saved: {}_{}'.format(
-            cfg['MODEL']['name'],
-            cfg['MODEL']['encoder']))
+        torch.save(ddp_model.state_dict(), path_save / 'model')
+        print('Model saved')
         with open(path_save / 'results.txt', 'w') as file:
             print(*epochs_train_ls, sep=',', file=file)
             print(*epochs_val_ls, sep=',', file=file)

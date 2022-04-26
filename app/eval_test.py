@@ -44,13 +44,12 @@ def main(args, device):
 
     model_ddp = Unet(
         encoder_name=cfg['MODEL']['encoder'],
-        encoder_depth=None,
+        encoder_weights=None,
         in_channels=n_channels,
         classes=n_classes
     ).to(device)
     model_ddp = DataParallel(model_ddp)
-    name_model = cfg['MODEL']['name'] + '_' + cfg['MODEL']['encoder']
-    model_ddp.load_state_dict(torch.load(path_save / name_model, map_location=device))
+    model_ddp.load_state_dict(torch.load(path_save / 'model', map_location=device))
 
     test_images, test_masks = load_np(cfg['DATASET']['test_images'], 
                                         cfg['DATASET']['test_masks'])

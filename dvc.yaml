@@ -11,13 +11,13 @@ stages:
         - MODEL.name
         - MODEL.encoder
     outs:
-      - save/UNet
+      - save/model
       - save/results.txt
   evaluate_val:
     cmd: python app/evaluate/eval_val.py
     deps:
       - app/evaluate/eval_val.py
-      - save/UNet
+      - save/model
       - save/results.txt
     outs:
       - save/val_plot.png
@@ -28,7 +28,7 @@ stages:
     cmd: python app/eval_test.py
     deps:
       - app/eval_test.py
-      - save/UNet
+      - save/model
     metrics:
       - save/test_metrics.json:
           cache: false
