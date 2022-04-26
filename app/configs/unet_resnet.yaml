@@ -16,6 +16,6 @@ MODEL:
 
 TRAIN:
   seed: 666
-  num_epoch: 30
+  num_epoch: 25
   batch_size: 8
   optim: "Adam"
