@@ -1,0 +1,41 @@
+schema: '2.0'
+stages:
+  train:
+    cmd: python train.py
+    deps:
+    - path: train.py
+      md5: 045adb7f6e1bb03d2cd8d00797792ca5
+      size: 6815
+    params:
+      app/configs/unet_resnet.yaml:
+        MODEL.encoder: resnet50
+        MODEL.name: UNet
+        TRAIN.num_epoch: 25
+        TRAIN.optim: Adam
+        TRAIN.seed: 666
+    outs:
+    - path: save/model
+      md5: 9cab50df7dda32cb1434471bc02b2321
+      size: 130416009
+    - path: save/results.txt
+      md5: 9af8356afcfccabea0cd828419e11e1c
+      size: 1905
+  evaluate_val:
+    cmd: python app/evaluate/eval_val.py
+    deps:
+    - path: app/evaluate/eval_val.py
+      md5: 058ce947cbf61d458b90a3a25e75c13c
+      size: 1881
+    - path: save/model
+      md5: 9cab50df7dda32cb1434471bc02b2321
+      size: 130416009
+    - path: save/results.txt
+      md5: 9af8356afcfccabea0cd828419e11e1c
+      size: 1905
+    outs:
+    - path: save/val_metrics.json
+      md5: c7dab1278716bb8cdc8e2b86d6ea65e9
+      size: 62
+    - path: save/val_plot.png
+      md5: 37f33c5ec6474d47181c3145365d4edc
+      size: 63787
