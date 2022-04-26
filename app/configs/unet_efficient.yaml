@@ -12,10 +12,10 @@ DATASET:
 
 MODEL:
   name: 'UNet'
-  encoder: 'resnet50'
+  encoder: 'efficientnet-b4'
 
 TRAIN:
   seed: 666
-  num_epoch: 25
+  num_epoch: 30
   batch_size: 8
   optim: "Adam"
