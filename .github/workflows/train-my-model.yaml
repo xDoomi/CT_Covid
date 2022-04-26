@@ -25,7 +25,7 @@ jobs:
       - name: 'Download requirements & data'
         run: |
           pip install -r requirements.txt
-          dvc pull
+          dvc pull -q
 
       - name: 'Start train'
         run: |
