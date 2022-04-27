@@ -159,7 +159,7 @@ def main(cfg, n_gpus):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Train script')
-    parser.add_argument('-cfg', metavar='FILE', type=str, default='app/configs/unet_resnet.yaml')
+    parser.add_argument('-cfg', metavar='FILE', type=str, default='app/configs/unet_densenet.yaml')
 
     args = parser.parse_args()
     
