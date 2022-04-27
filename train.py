@@ -15,7 +15,7 @@ import torch.optim as optim
 from torch.utils.data import DataLoader, DistributedSampler
 from torch.nn.parallel import DistributedDataParallel as DDP
 
-from segmentation_models_pytorch import Unet
+from segmentation_models_pytorch import FPN
 from app.dataset.datasetCT import DatasetCT, DatasetAugmentCT
 from app.metrics.dice_score import dice_loss
 from app.metrics.utils import iou_mean, pixel_accuracy
@@ -30,13 +30,13 @@ def train(rank, world_size, train_ds_all, val_ds, cfg):
     batch_size = int(cfg['TRAIN']['batch_size'] / world_size)
 
     torch.cuda.set_device(rank)
-    model = Unet(
+    model = FPN(
         encoder_name=cfg['MODEL']['encoder'],
         encoder_weights=None,
         in_channels=n_channels,
         classes=n_classes
     ).cuda(rank)
-    ddp_model = DDP(model, device_ids=[rank])
+    ddp_model = DDP(model, device_ids=[rank], find_unused_parameters=True)
 
     optimizer = optim.Adam(ddp_model.parameters())
     criterion = nn.CrossEntropyLoss().cuda(rank)
@@ -159,7 +159,7 @@ def main(cfg, n_gpus):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Train script')
-    parser.add_argument('-cfg', metavar='FILE', type=str, default='app/configs/unet_resnet.yaml')
+    parser.add_argument('-cfg', metavar='FILE', type=str, default='app/configs/fpn_efficientnet.yaml')
 
     args = parser.parse_args()
     
