@@ -4,7 +4,7 @@ stages:
     deps:
       - train.py
     params:
-      - app/configs/unet_resnet.yaml:
+      - app/configs/pspnet_resnet.yaml:
         - TRAIN.seed
         - TRAIN.num_epoch
         - TRAIN.optim
