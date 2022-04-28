@@ -4,8 +4,8 @@ stages:
     cmd: python train.py
     deps:
     - path: train.py
-      md5: d9cb7a74bc33cb3208b0ffcbf10270da
-      size: 6850
+      md5: 62a361b2f2ff19a3dd7b6a7f3a656845
+      size: 6721
     params:
       app/configs/pspnet_resnet.yaml:
         MODEL.encoder: resnet50
@@ -15,11 +15,11 @@ stages:
         TRAIN.seed: 666
     outs:
     - path: save/model
-      md5: 5581709d70b7340757ceec5020a02e74
+      md5: 94c1fe75e47154ae1361d8d7655dfbe6
       size: 97557581
     - path: save/results.txt
-      md5: 5b57dd63154c37d84a87a9eb2cad1666
-      size: 2291
+      md5: f4469bfce855cad7af1baa71169ba863
+      size: 2281
   evaluate_val:
     cmd: python app/evaluate/eval_val.py
     deps:
@@ -27,15 +27,15 @@ stages:
       md5: 0f164c27b5291141385326928ff7675c
       size: 1883
     - path: save/model
-      md5: 5581709d70b7340757ceec5020a02e74
+      md5: 94c1fe75e47154ae1361d8d7655dfbe6
       size: 97557581
     - path: save/results.txt
-      md5: 5b57dd63154c37d84a87a9eb2cad1666
-      size: 2291
+      md5: f4469bfce855cad7af1baa71169ba863
+      size: 2281
     outs:
     - path: save/val_metrics.json
-      md5: 247cf2f50843aea8b48e5286cc2963f0
-      size: 63
+      md5: 91562fb6b620183aed1cb367bb8aef4e
+      size: 62
     - path: save/val_plot.png
-      md5: 8c2eaa8cea40d5bb02bde6b2f6c97105
-      size: 68739
+      md5: 42c77a12705e1bf7b5c70d61d43de630
+      size: 75290
