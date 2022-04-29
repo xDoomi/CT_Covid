@@ -13,6 +13,8 @@ def iou_mean(predict: torch.Tensor, label: torch.Tensor, n_classes: int):
 
 
 def iou(predict: torch.Tensor, label: torch.Tensor):
+    if torch.sum(predict) == 0 and torch.sum(label) == 0:
+        return 1.
     overlap = torch.sum(predict * label)
     union = torch.sum(predict) + torch.sum(label) - overlap
     if union == 0.:
