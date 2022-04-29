@@ -24,19 +24,26 @@ class DatasetCT(Dataset):
     def __init__(self,
                 images: np.ndarray,
                 masks: np.ndarray,
-                concatenate_class: bool = False,
+                n_classes: int = 4,
                 test: bool = False):
         super().__init__()
 
         self.length = len(images)
         self.images = images
-        self.concatenate_class = concatenate_class
-
-        if self.concatenate_class:
-            masks = np.stack((masks[..., 0] + masks[..., 1], masks[..., 3]))
-            self.masks = np.transpose(masks, (1, 0, 2, 3))
-        elif test:
+        self.n_classes = n_classes
+        self.test = test
+        
+        if self.test:
             self.masks = masks
+        elif self.n_classes == 3:
+            concat_class = masks[..., 0] + masks[..., 1]
+            masks = np.stack((concat_class, masks[..., 2], masks[..., 3]))
+            self.masks = np.transpose(masks, (1, 0, 2, 3))
+        elif self.n_classes == 2:
+            concat_class = masks[..., 0] + masks[..., 1]
+            background = np.logical_not(concat_class, out=np.ndarray(concat_class.shape))
+            masks = np.stack((concat_class, background))
+            self.masks = np.transpose(masks, (1, 0, 2, 3))
         else:
             self.masks = np.transpose(masks, (0, 3, 1, 2))
 
@@ -58,8 +65,8 @@ class DatasetAugmentCT(DatasetCT):
     def __init__(self,
             images: np.ndarray,
             masks: np.ndarray,
-            concatenate_class: bool = False):
-        super(DatasetAugmentCT, self).__init__(images, masks, concatenate_class)
+            n_classes: int = 4):
+        super(DatasetAugmentCT, self).__init__(images, masks, n_classes)
 
         self.transforms = myCompose([
             myToTensor(),
@@ -72,7 +79,15 @@ class DatasetAugmentCT(DatasetCT):
         img = preprocessing.normalize(self.images[index])
         mask = self.masks[index]
         img, mask = self.transforms(img, mask)
-        mask = torch.stack((mask[0], torch.logical_not(mask[0], out=torch.Tensor())))
+        if self.n_classes == 2:
+            background = torch.logical_not(mask[0], out=torch.Tensor())
+            mask = torch.stack((mask[0], background))
+        elif self.n_classes == 3:
+            background = torch.logical_not(mask[0] + mask[1], out=torch.Tensor())
+            mask = torch.stack((mask[0], mask[1], background))
+        else:
+            background = torch.logical_not(mask[0] + mask[1] + mask[2], out=torch.Tensor())
+            mask = torch.stack((mask[0], mask[1], mask[2], background))
         return img, mask
 
 

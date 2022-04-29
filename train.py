@@ -90,7 +90,7 @@ def train(rank, world_size, train_ds_all, val_ds, cfg):
                                 target,
                                 multiclass=True)
                 predict = F.softmax(output, dim=1)[0]
-                predict = F.one_hot(predict.argmax(dim=0), cfg['DATASET']['num_classes']).permute(2, 0, 1)
+                predict = F.one_hot(predict.argmax(dim=0), n_classes).permute(2, 0, 1)
                 pixel_cor += pixel_accuracy(predict, target.squeeze())
                 iou += iou_mean(predict, target.squeeze(), n_classes)
                 val_loss += loss.item()
@@ -143,11 +143,9 @@ def main(cfg, n_gpus):
     val_images, val_masks = load_np(cfg['DATASET']['val_images'], 
                                     cfg['DATASET']['val_masks'])
 
-    concatenate_class = cfg['DATASET']['concatenate_class']
+    train_ds = DatasetAugmentCT(np.squeeze(train_images), train_masks, n_classes=cfg['DATASET']['num_classes'])
 
-    train_ds = DatasetAugmentCT(np.squeeze(train_images), train_masks, concatenate_class)
-
-    val_ds = DatasetCT(np.squeeze(val_images), val_masks, concatenate_class)
+    val_ds = DatasetCT(np.squeeze(val_images), val_masks, n_classes=cfg['DATASET']['num_classes'])
     
     mp.spawn(train,
         args=(n_gpus, train_ds, val_ds, cfg),
