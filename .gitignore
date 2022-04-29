@@ -128,3 +128,5 @@ dmypy.json
 # Pyre type checker
 .pyre/
 app/dataset/test.ipynb
+app/eval.ipynb
+app/eval.py
