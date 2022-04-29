@@ -90,7 +90,7 @@ def train(rank, world_size, train_ds_all, val_ds, cfg):
                                 target,
                                 multiclass=True)
                 predict = F.softmax(output, dim=1)[0]
-                predict = F.one_hot(predict.argmax(dim=0), cfg['DATASET']['num_classes']).permute(2, 0, 1)
+                predict = F.one_hot(predict.argmax(dim=0), n_classes).permute(2, 0, 1)
                 pixel_cor += pixel_accuracy(predict, target.squeeze())
                 iou += iou_mean(predict, target.squeeze(), n_classes)
                 val_loss += loss.item()
@@ -105,7 +105,7 @@ def train(rank, world_size, train_ds_all, val_ds, cfg):
                 iou / len(val_loader.dataset)
             ))
             print('-----------------------------------------------------')
-            epochs_train_ls.append(cfg['TRAIN']['batch_size'] * tr_loss / len(train_loader.dataset))
+            epochs_train_ls.append(batch_size * cfg['TRAIN']['batch_size'] * tr_loss / len(train_loader.dataset))
             epochs_val_ls.append(val_loss / len(val_loader.dataset))
             epochs_val_cor.append(pixel_cor / len(val_loader.dataset))
             epochs_val_iou.append(iou / len(val_loader.dataset))
@@ -143,16 +143,12 @@ def main(cfg, n_gpus):
     val_images, val_masks = load_np(cfg['DATASET']['val_images'], 
                                     cfg['DATASET']['val_masks'])
 
-    concatenate_class = cfg['DATASET']['concatenate_class']
+    train_ds = DatasetAugmentCT(np.squeeze(train_images), train_masks, n_classes=cfg['DATASET']['num_classes'])
 
-    train_ds = DatasetCT(np.squeeze(train_images), train_masks, concatenate_class)
-    train_ds_augment = DatasetAugmentCT(np.squeeze(train_images), train_masks, concatenate_class)
-    train_ds_all = train_ds + train_ds_augment
-
-    val_ds = DatasetCT(np.squeeze(val_images), val_masks, concatenate_class)
+    val_ds = DatasetCT(np.squeeze(val_images), val_masks, n_classes=cfg['DATASET']['num_classes'])
     
     mp.spawn(train,
-        args=(n_gpus, train_ds_all, val_ds, cfg),
+        args=(n_gpus, train_ds, val_ds, cfg),
         nprocs=n_gpus,
         join=True)
 
