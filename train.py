@@ -38,7 +38,7 @@ def train(rank, world_size, train_ds_all, val_ds, cfg):
     ).cuda(rank)
     ddp_model = DDP(model, device_ids=[rank], find_unused_parameters=True)
 
-    optimizer = optim.Adam(ddp_model.parameters())
+    optimizer = optim.AdamW(ddp_model.parameters())
     criterion = nn.CrossEntropyLoss().cuda(rank)
 
     train_sample = DistributedSampler(train_ds_all)
