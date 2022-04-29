@@ -11,7 +11,7 @@ DATASET:
   concatenate_class: True
 
 MODEL:
-  name: 'PSPNet'
+  name: 'UNet'
   encoder: 'resnet50'
 
 TRAIN:

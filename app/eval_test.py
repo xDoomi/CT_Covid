@@ -9,7 +9,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.nn.parallel import DataParallel
 
-from segmentation_models_pytorch import PSPNet
+from segmentation_models_pytorch import Unet
 from dataset.datasetCT import DatasetCT
 from metrics.utils import iou, pixel_accuracy
 from metrics.dice_score import dice_coeff
@@ -43,7 +43,7 @@ def main(args, device):
     n_channels = cfg['DATASET']['num_channels']
     n_classes = cfg['DATASET']['num_classes']
 
-    model_ddp = PSPNet(
+    model_ddp = Unet(
         encoder_name=cfg['MODEL']['encoder'],
         encoder_weights=None,
         in_channels=n_channels,
@@ -76,7 +76,7 @@ def main(args, device):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Test script')
-    parser.add_argument('-cfg', metavar='FILE', type=str, default='app/configs/pspnet_resnet.yaml')
+    parser.add_argument('-cfg', metavar='FILE', type=str, default='app/configs/unet_resnet.yaml')
     args = parser.parse_args()
 
     if torch.cuda.is_available():
