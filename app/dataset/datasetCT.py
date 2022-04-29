@@ -33,7 +33,7 @@ class DatasetCT(Dataset):
         self.concatenate_class = concatenate_class
 
         if self.concatenate_class:
-            masks = np.stack((masks[..., 0] + masks[..., 1], masks[..., 2], masks[..., 3]))
+            masks = np.stack((masks[..., 0] + masks[..., 1], masks[..., 3]))
             self.masks = np.transpose(masks, (1, 0, 2, 3))
         elif test:
             self.masks = masks
@@ -72,7 +72,7 @@ class DatasetAugmentCT(DatasetCT):
         img = preprocessing.normalize(self.images[index])
         mask = self.masks[index]
         img, mask = self.transforms(img, mask)
-        mask = torch.stack((mask[0], mask[1], torch.logical_not(mask[0] + mask[1], out=torch.Tensor())))
+        mask = torch.stack((mask[0], torch.logical_not(mask[0], out=torch.Tensor())))
         return img, mask
 
 
