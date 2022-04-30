@@ -12,6 +12,7 @@ from torch.nn.parallel import DataParallel
 from segmentation_models_pytorch import Unet
 from dataset.datasetCT import DatasetCT
 from metrics.utils import iou, pixel_accuracy
+from metrics.dice_score import dice_coeff
 
 
 def load_np(images_path, masks_path):
@@ -56,6 +57,7 @@ def main(args, device):
     test_ds = DatasetCT(test_images, test_masks, test=True)
     iou_metrics = 0
     pixel_correct = 0
+    dice = 0
 
     for i in range(len(test_ds)):
         temp = test_ds[i]
@@ -64,9 +66,12 @@ def main(args, device):
         conc_mask = mask[0]
         pixel_correct += pixel_accuracy(conc_mask, target.squeeze())
         iou_metrics += iou(conc_mask, target.squeeze()).item()
+        dice += dice_coeff(conc_mask, target.squeeze().to(torch.int64)).item()
 
     with open(path_save / 'test_metrics.json', 'w') as outfile:
-        json.dump({'pixel_correct' : pixel_correct / len(test_ds), 'iou': iou_metrics / len(test_ds)}, outfile)
+        json.dump({'pixel_correct' : pixel_correct / len(test_ds), 
+                    'iou' : iou_metrics / len(test_ds),
+                    'dice' : dice / len(test_ds)}, outfile)
 
 
 if __name__ == '__main__':
