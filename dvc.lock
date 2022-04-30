@@ -10,16 +10,16 @@ stages:
       app/configs/unet_efficient.yaml:
         MODEL.encoder: efficientnet-b4
         MODEL.name: UNet
-        TRAIN.num_epoch: 30
-        TRAIN.optim: Adam
+        TRAIN.num_epoch: 50
+        TRAIN.optim: AdamW
         TRAIN.seed: 666
     outs:
     - path: save/model
-      md5: 7d7a0e8bd6bbca7724b2a4c368223427
-      size: 81694213
+      md5: 51cdb48e03b3f7e3360cba902c14e48c
+      size: 81693637
     - path: save/results.txt
-      md5: 886c2ad1e59880d88415d41806e24408
-      size: 2269
+      md5: 1f4b547d6a81aac9adb73a3eddd9a750
+      size: 3780
   evaluate_val:
     cmd: python app/evaluate/eval_val.py
     deps:
@@ -27,15 +27,15 @@ stages:
       md5: 6a70d820eb33cd13ebb9feb933e018a6
       size: 1884
     - path: save/model
-      md5: 7d7a0e8bd6bbca7724b2a4c368223427
-      size: 81694213
+      md5: 51cdb48e03b3f7e3360cba902c14e48c
+      size: 81693637
     - path: save/results.txt
-      md5: 886c2ad1e59880d88415d41806e24408
-      size: 2269
+      md5: 1f4b547d6a81aac9adb73a3eddd9a750
+      size: 3780
     outs:
     - path: save/val_metrics.json
-      md5: 437aeaf1d08019a4bb305f1ece3addea
+      md5: 5b8d80ff1648200ec34849bc33e6a57e
       size: 62
     - path: save/val_plot.png
-      md5: d777ee84c2d8920cb0e92f831c4d1f5f
-      size: 92608
+      md5: 26ebbc286407f005fb87741c2771ae88
+      size: 78878
