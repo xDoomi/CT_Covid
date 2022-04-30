@@ -4,22 +4,22 @@ stages:
     cmd: python train.py
     deps:
     - path: train.py
-      md5: b6d24d8e1e655751931a2862e12020bc
-      size: 6818
+      md5: a15189e389e163548c90626bde88a5ed
+      size: 6652
     params:
       app/configs/unet_densenet.yaml:
         MODEL.encoder: densenet201
         MODEL.name: UNet
-        TRAIN.num_epoch: 30
+        TRAIN.num_epoch: 50
         TRAIN.optim: AdamW
         TRAIN.seed: 666
     outs:
     - path: save/model
-      md5: 7b572cc70f7be6128dc42e66e84be11a
-      size: 115723686
+      md5: e932865e00f0e2bfef9916b62c1c9492
+      size: 115723110
     - path: save/results.txt
-      md5: ed8a9f5e08cc56fec94b1b8bf4503eb6
-      size: 2282
+      md5: fb5aba110ccf7d973cda0be8fd541b42
+      size: 3762
   evaluate_val:
     cmd: python app/evaluate/eval_val.py
     deps:
@@ -27,15 +27,15 @@ stages:
       md5: 7a10ab1396178316d69d4b397185ce19
       size: 1883
     - path: save/model
-      md5: 7b572cc70f7be6128dc42e66e84be11a
-      size: 115723686
+      md5: e932865e00f0e2bfef9916b62c1c9492
+      size: 115723110
     - path: save/results.txt
-      md5: ed8a9f5e08cc56fec94b1b8bf4503eb6
-      size: 2282
+      md5: fb5aba110ccf7d973cda0be8fd541b42
+      size: 3762
     outs:
     - path: save/val_metrics.json
-      md5: b6dd09acf081d5a5148847ea433d8e86
+      md5: 8fca2ac60eecc3321476978bca1fbef8
       size: 62
     - path: save/val_plot.png
-      md5: 33546654f57b2f12e4b16c10852a6d3e
-      size: 68626
+      md5: b1d0a17bcb4e610f50f3de0aacd21152
+      size: 100865
