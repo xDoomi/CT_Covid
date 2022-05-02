@@ -42,6 +42,8 @@ def main(args, device):
 
     n_channels = cfg['DATASET']['num_channels']
     n_classes = cfg['DATASET']['num_classes']
+    min_bound = cfg['DATASET']['min_bound']
+    max_bound = cfg['DATASET']['max_bound']
 
     model_ddp = Unet(
         encoder_name=cfg['MODEL']['encoder'],
@@ -54,7 +56,7 @@ def main(args, device):
 
     test_images, test_masks = load_np(cfg['DATASET']['test_images'], 
                                         cfg['DATASET']['test_masks'])
-    test_ds = DatasetCT(test_images, test_masks, test=True)
+    test_ds = DatasetCT(test_images, test_masks, min_bound, max_bound, test=True)
     iou_metrics = 0
     pixel_correct = 0
     dice = 0
