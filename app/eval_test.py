@@ -66,7 +66,7 @@ def main(args, device):
         conc_mask = mask[0]
         pixel_correct += pixel_accuracy(conc_mask, target.squeeze())
         iou_metrics += iou(conc_mask, target.squeeze()).item()
-        dice += dice_coeff(conc_mask, target.squeeze()).item()
+        dice += dice_coeff(conc_mask, target.squeeze().to(torch.int64)).item()
 
     with open(path_save / 'test_metrics.json', 'w') as outfile:
         json.dump({'pixel_correct' : pixel_correct / len(test_ds), 
