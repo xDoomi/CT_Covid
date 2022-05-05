@@ -143,9 +143,13 @@ def main(cfg, n_gpus):
     val_images, val_masks = load_np(cfg['DATASET']['val_images'], 
                                     cfg['DATASET']['val_masks'])
 
-    train_ds = DatasetAugmentCT(np.squeeze(train_images), train_masks, n_classes=cfg['DATASET']['num_classes'])
+    min_bound, max_bound = cfg['DATASET']['min_bound'], cfg['DATASET']['max_bound']
 
-    val_ds = DatasetCT(np.squeeze(val_images), val_masks, n_classes=cfg['DATASET']['num_classes'])
+    train_ds = DatasetAugmentCT(np.squeeze(train_images), train_masks, min_bound, 
+                                max_bound, n_classes=cfg['DATASET']['num_classes'])
+
+    val_ds = DatasetCT(np.squeeze(val_images), val_masks, min_bound, 
+                        max_bound, n_classes=cfg['DATASET']['num_classes'])
     
     mp.spawn(train,
         args=(n_gpus, train_ds, val_ds, cfg),
