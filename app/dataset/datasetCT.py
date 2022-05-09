@@ -44,7 +44,7 @@ class DatasetCT(Dataset):
             self.masks = np.transpose(masks, (1, 0, 2, 3))
         elif self.n_classes == 2:
             concat_class = masks[..., 0] + masks[..., 1]
-            background = np.logical_not(concat_class, out=np.ndarray(concat_class.shape))
+            background = self.logical_not(concat_class)
             masks = np.stack((concat_class, background))
             self.masks = np.transpose(masks, (1, 0, 2, 3))
         else:
@@ -54,6 +54,11 @@ class DatasetCT(Dataset):
             ToTensor()
         ])
     
+    def logical_not(self, image):
+        image *= -1
+        image += 1
+        return image
+
     def normalize(self, image):
         image = (image - self.min_bound) / (self.max_bound - self.min_bound)
         image[image>1] = 1.
@@ -91,13 +96,13 @@ class DatasetAugmentCT(DatasetCT):
         mask = self.masks[index]
         img, mask = self.transforms(img, mask)
         if self.n_classes == 2:
-            background = torch.logical_not(mask[0], out=torch.Tensor())
+            background = self.logical_not(mask[0])
             mask = torch.stack((mask[0], background))
         elif self.n_classes == 3:
-            background = torch.logical_not(mask[0] + mask[1], out=torch.Tensor())
+            background = self.logical_not(mask[0] + mask[1])
             mask = torch.stack((mask[0], mask[1], background))
         else:
-            background = torch.logical_not(mask[0] + mask[1] + mask[2], out=torch.Tensor())
+            background = self.logical_not(mask[0] + mask[1] + mask[2])
             mask = torch.stack((mask[0], mask[1], mask[2], background))
         return img, mask
 
