@@ -1,6 +1,5 @@
 import numpy as np
 import random
-from sklearn import preprocessing
 
 import torch
 from torch.utils.data import Dataset
@@ -24,12 +23,16 @@ class DatasetCT(Dataset):
     def __init__(self,
                 images: np.ndarray,
                 masks: np.ndarray,
+                min_bound: float,
+                max_bound: float,
                 n_classes: int = 4,
                 test: bool = False):
         super().__init__()
 
         self.length = len(images)
         self.images = images
+        self.min_bound = min_bound
+        self.max_bound = max_bound
         self.n_classes = n_classes
         self.test = test
         
@@ -51,11 +54,17 @@ class DatasetCT(Dataset):
             ToTensor()
         ])
     
+    def normalize(self, image):
+        image = (image - self.min_bound) / (self.max_bound - self.min_bound)
+        image[image>1] = 1.
+        image[image<0] = 0.
+        return image
+
     def __len__(self):
         return self.length
 
     def __getitem__(self, index):
-        image_norm = preprocessing.normalize(self.images[index])
+        image_norm = self.normalize(self.images[index])
         mask = self.masks[index]
         return (self.transforms(image_norm), torch.from_numpy(mask))
 
@@ -65,8 +74,10 @@ class DatasetAugmentCT(DatasetCT):
     def __init__(self,
             images: np.ndarray,
             masks: np.ndarray,
+            min_bound: int,
+            max_bound: int,
             n_classes: int = 4):
-        super(DatasetAugmentCT, self).__init__(images, masks, n_classes)
+        super(DatasetAugmentCT, self).__init__(images, masks, min_bound, max_bound, n_classes)
 
         self.transforms = myCompose([
             myToTensor(),
@@ -76,7 +87,7 @@ class DatasetAugmentCT(DatasetCT):
         ])
 
     def __getitem__(self, index):
-        img = preprocessing.normalize(self.images[index])
+        img = self.normalize(self.images[index])
         mask = self.masks[index]
         img, mask = self.transforms(img, mask)
         if self.n_classes == 2:
