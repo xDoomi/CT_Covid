@@ -4,8 +4,8 @@ stages:
     cmd: python train.py
     deps:
     - path: train.py
-      md5: b52f45c6c2c09f02347b69b21bd6f461
-      size: 6646
+      md5: d0cbf661c6f108fd66a11c2925d262fc
+      size: 6833
     params:
       app/configs/fpn_resnet.yaml:
         MODEL.encoder: resnet50
@@ -15,11 +15,11 @@ stages:
         TRAIN.seed: 666
     outs:
     - path: save/model
-      md5: 63e44778bb25bc460228078042b0f4c5
+      md5: 0835f783e03ad9d8d5709fc490b36756
       size: 104776647
     - path: save/results.txt
-      md5: 05fb3085ce8cd9ff7ef21a05564cb91c
-      size: 3786
+      md5: ea5ec9264f29c1f78f3ca49e2f73cfe2
+      size: 3776
   evaluate_val:
     cmd: python app/evaluate/eval_val.py
     deps:
@@ -27,15 +27,15 @@ stages:
       md5: adefe4319144091b1419565594944e22
       size: 1880
     - path: save/model
-      md5: 63e44778bb25bc460228078042b0f4c5
+      md5: 0835f783e03ad9d8d5709fc490b36756
       size: 104776647
     - path: save/results.txt
-      md5: 05fb3085ce8cd9ff7ef21a05564cb91c
-      size: 3786
+      md5: ea5ec9264f29c1f78f3ca49e2f73cfe2
+      size: 3776
     outs:
     - path: save/val_metrics.json
-      md5: 6a9cee11c91c922f79b671ed21e5dabf
-      size: 62
+      md5: a7d9ec46eef1732daff12f290c11ab17
+      size: 61
     - path: save/val_plot.png
-      md5: 46ccb658705c815878899ca4a04ffba6
-      size: 101617
+      md5: 698834d5be691c9f07ab0934aaa5b05e
+      size: 101668
