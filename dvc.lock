@@ -4,22 +4,22 @@ stages:
     cmd: python train.py
     deps:
     - path: train.py
-      md5: b5660b99f743a79820c4efbfcc104819
-      size: 6847
+      md5: 2207843ba0fe5b391a49e268d2617e25
+      size: 7072
     params:
       app/configs/fpn_efficientnet.yaml:
         MODEL.encoder: efficientnet-b4
         MODEL.name: FPN
-        TRAIN.num_epoch: 30
-        TRAIN.optim: Adam
+        TRAIN.num_epoch: 50
+        TRAIN.optim: AdamW
         TRAIN.seed: 666
     outs:
     - path: save/model
-      md5: ba1dadec656ddeb46da4ad359ca8f471
-      size: 78179843
+      md5: 0a49815ed9b6ba50ade86b444fd6d7eb
+      size: 78179331
     - path: save/results.txt
-      md5: bd478c87a4e3535c3f18a0a8468b9162
-      size: 2292
+      md5: ed768ed42e94caa549434d71b8ad0079
+      size: 3817
   evaluate_val:
     cmd: python app/evaluate/eval_val.py
     deps:
@@ -27,15 +27,15 @@ stages:
       md5: e4e3915edc3e13f9ae44d46373dc0e89
       size: 1886
     - path: save/model
-      md5: ba1dadec656ddeb46da4ad359ca8f471
-      size: 78179843
+      md5: 0a49815ed9b6ba50ade86b444fd6d7eb
+      size: 78179331
     - path: save/results.txt
-      md5: bd478c87a4e3535c3f18a0a8468b9162
-      size: 2292
+      md5: ed768ed42e94caa549434d71b8ad0079
+      size: 3817
     outs:
     - path: save/val_metrics.json
-      md5: c13a3b6ec062a5ce5fbbe34e2e5b362e
-      size: 63
+      md5: 485a154138099dd4fe72b5c51b545733
+      size: 62
     - path: save/val_plot.png
-      md5: b4582d996ceaa2cfcdcd6413488426c5
-      size: 67559
+      md5: 574eafdf5e1dcc9d3c44d3b559f5bed0
+      size: 89618
