@@ -15,11 +15,11 @@ stages:
         TRAIN.seed: 666
     outs:
     - path: save/model
-      md5: f356ccd787e510bc48605ea38eb43e7e
+      md5: 026c3d58b8bbddb32ad66d4a37909f8b
       size: 104776647
     - path: save/results.txt
-      md5: 589c2f8a1185739e1381ff0ef6837218
-      size: 3030
+      md5: 299e5b08a31ca937d56f987fbbafa3ab
+      size: 3802
   evaluate_val:
     cmd: python app/evaluate/eval_val.py
     deps:
@@ -27,15 +27,15 @@ stages:
       md5: adefe4319144091b1419565594944e22
       size: 1880
     - path: save/model
-      md5: f356ccd787e510bc48605ea38eb43e7e
+      md5: 026c3d58b8bbddb32ad66d4a37909f8b
       size: 104776647
     - path: save/results.txt
-      md5: 589c2f8a1185739e1381ff0ef6837218
-      size: 3030
+      md5: 299e5b08a31ca937d56f987fbbafa3ab
+      size: 3802
     outs:
     - path: save/val_metrics.json
-      md5: 77cb76e66ca00e8202ee066e31fce170
-      size: 49
+      md5: 2501dc8ee9eba89e9a1084a9d7cad9cb
+      size: 62
     - path: save/val_plot.png
-      md5: 397670fd059260ba3ec05c89a09092d5
-      size: 46491
+      md5: fe1d3e888fc46dcd1012b7934ce65ad3
+      size: 95023
