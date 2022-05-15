@@ -13,7 +13,7 @@ DATASET:
 
 MODEL:
   name: 'UNet'
-  encoder: 'resnet50'
+  encoder: 'efficientnet-b4'
 
 TRAIN:
   seed: 666
