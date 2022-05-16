@@ -146,14 +146,16 @@ def main(cfg, n_gpus):
     min_bound, max_bound = cfg['DATASET']['min_bound'], cfg['DATASET']['max_bound']
 
     train_ds = DatasetCT(np.squeeze(train_images), train_masks, min_bound, 
-                        max_bound, n_classes=cfg['DATASET']['num_classes'])
-
-    train_ds_aug = DatasetAugmentCT(np.squeeze(train_images), train_masks, min_bound, 
                                 max_bound, n_classes=cfg['DATASET']['num_classes'])
     train_ds_all = train_ds + train_ds_aug
 
     train_ds = DatasetCT(np.squeeze(train_images), train_masks, min_bound,
                         max_bound, n_classes=cfg['DATASET']['num_classes'])
+
+    train_ds_all = train_ds + train_ds_aug
+
+    train_ds_aug = DatasetAugmentCT(np.squeeze(train_images), train_masks, min_bound, 
+                                max_bound, n_classes=cfg['DATASET']['num_classes'])
 
     train_ds_all = train_ds + train_ds_aug
 
@@ -168,7 +170,7 @@ def main(cfg, n_gpus):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Train script')
-    parser.add_argument('-cfg', metavar='FILE', type=str, default='app/configs/fpn_efficientnet.yaml')
+    parser.add_argument('-cfg', metavar='FILE', type=str, default='app/configs/fpn_densenet.yaml')
 
     args = parser.parse_args()
     

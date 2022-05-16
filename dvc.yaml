@@ -5,7 +5,7 @@ stages:
     deps:
       - train.py
     params:
-      - app/configs/fpn_efficientnet.yaml:
+      - app/configs/fpn_densenet.yaml:
         - TRAIN.seed
         - TRAIN.num_epoch
         - TRAIN.optim
