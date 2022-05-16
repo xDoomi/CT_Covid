@@ -1,10 +1,11 @@
 stages:
   train:
     cmd: python train.py
+    always_changed: true
     deps:
       - train.py
     params:
-      - app/configs/pspnet_resnet.yaml:
+      - app/configs/fpn_resnet.yaml:
         - TRAIN.seed
         - TRAIN.num_epoch
         - TRAIN.optim
@@ -15,6 +16,7 @@ stages:
       - save/results.txt
   evaluate_val:
     cmd: python app/evaluate/eval_val.py
+    always_changed: true
     deps:
       - app/evaluate/eval_val.py
       - save/model

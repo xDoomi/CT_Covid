@@ -15,7 +15,7 @@ import torch.optim as optim
 from torch.utils.data import DataLoader, DistributedSampler
 from torch.nn.parallel import DistributedDataParallel as DDP
 
-from segmentation_models_pytorch import PSPNet
+from segmentation_models_pytorch import FPN
 from app.dataset.datasetCT import DatasetCT, DatasetAugmentCT
 from app.metrics.dice_score import dice_loss
 from app.metrics.utils import iou_mean, pixel_accuracy
@@ -30,7 +30,7 @@ def train(rank, world_size, train_ds_all, val_ds, cfg):
     batch_size = int(cfg['TRAIN']['batch_size'] / world_size)
 
     torch.cuda.set_device(rank)
-    model = PSPNet(
+    model = FPN(
         encoder_name=cfg['MODEL']['encoder'],
         encoder_weights=None,
         in_channels=n_channels,
@@ -145,11 +145,12 @@ def main(cfg, n_gpus):
 
     min_bound, max_bound = cfg['DATASET']['min_bound'], cfg['DATASET']['max_bound']
 
-    train_ds = DatasetCT(np.squeeze(train_images), train_masks, min_bound, 
-                                max_bound, n_classes=cfg['DATASET']['num_classes'])
-
     train_ds_aug = DatasetAugmentCT(np.squeeze(train_images), train_masks, min_bound, 
                                 max_bound, n_classes=cfg['DATASET']['num_classes'])
+
+    train_ds = DatasetCT(np.squeeze(train_images), train_masks, min_bound,
+                        max_bound, n_classes=cfg['DATASET']['num_classes'])
+
     train_ds_all = train_ds + train_ds_aug
 
     val_ds = DatasetCT(np.squeeze(val_images), val_masks, min_bound, 
@@ -163,11 +164,8 @@ def main(cfg, n_gpus):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Train script')
-<<<<<<< HEAD
-    parser.add_argument('-cfg', metavar='FILE', type=str, default='app/configs/unet_efficient.yaml')
-=======
-    parser.add_argument('-cfg', metavar='FILE', type=str, default='app/configs/unet_densenet.yaml')
->>>>>>> unet-densenet
+
+    parser.add_argument('-cfg', metavar='FILE', type=str, default='app/configs/fpn_resnet.yaml')
 
     args = parser.parse_args()
     
