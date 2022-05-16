@@ -4,51 +4,38 @@ stages:
     cmd: python train.py
     deps:
     - path: train.py
-      md5: 0ff968632d527efa2574e3078f2f8a7f
-      size: 6868
+      md5: 5d9ac7802902a97e8dcf07480bc84ecc
+      size: 6839
     params:
-      app/configs/unet_efficient.yaml:
-        MODEL.encoder: efficientnet-b4
+      app/configs/unet_densenet.yaml:
+        MODEL.encoder: densenet201
         MODEL.name: UNet
-        TRAIN.num_epoch: 50
+        TRAIN.num_epoch: 100
         TRAIN.optim: AdamW
         TRAIN.seed: 666
     outs:
     - path: save/model
-      md5: 32cf6a229c224c593dff8f68d06cad2f
-      size: 81693637
+      md5: 7f9f8fac39aadc30bbac3bcf400dda40
+      size: 115723110
     - path: save/results.txt
-      md5: 0656fab578b3652246940476fa42b72a
-      size: 3782
+      md5: b5adad53a1e502d876a2d8db89a0d683
+      size: 7597
   evaluate_val:
     cmd: python app/evaluate/eval_val.py
     deps:
     - path: app/evaluate/eval_val.py
-      md5: 6a70d820eb33cd13ebb9feb933e018a6
-      size: 1884
+      md5: 7a10ab1396178316d69d4b397185ce19
+      size: 1883
     - path: save/model
-      md5: 32cf6a229c224c593dff8f68d06cad2f
-      size: 81693637
+      md5: 7f9f8fac39aadc30bbac3bcf400dda40
+      size: 115723110
     - path: save/results.txt
-      md5: 0656fab578b3652246940476fa42b72a
-      size: 3782
+      md5: b5adad53a1e502d876a2d8db89a0d683
+      size: 7597
     outs:
     - path: save/val_metrics.json
-      md5: f4b3f211e3f262e598b5c57622f8e3b4
-      size: 61
+      md5: a1e27576d38f3c52a5fcb050c0590227
+      size: 62
     - path: save/val_plot.png
-      md5: 90e79b06155eb59155b891ea5c700c1c
-      size: 76001
-  evaluate_test:
-    cmd: python app/eval_test.py
-    deps:
-    - path: app/eval_test.py
-      md5: 669670ef1af417bc600f8652b1f4e11b
-      size: 2790
-    - path: save/model
-      md5: 32cf6a229c224c593dff8f68d06cad2f
-      size: 81693637
-    outs:
-    - path: save/test_metrics.json
-      md5: 5f0a991098a4a0863debd2339e7c412c
-      size: 93
+      md5: 3b2cdbb44d8f91e7aaca2604c40eca41
+      size: 111664

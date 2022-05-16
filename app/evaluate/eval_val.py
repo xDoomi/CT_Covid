@@ -47,6 +47,6 @@ def main(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Evaluate validation script')
-    parser.add_argument('-cfg', metavar='FILE', type=str, default='app/configs/unet_efficient.yaml')
+    parser.add_argument('-cfg', metavar='FILE', type=str, default='app/configs/unet_densenet.yaml')
     args = parser.parse_args()
     main(args)
