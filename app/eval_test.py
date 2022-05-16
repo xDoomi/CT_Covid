@@ -78,7 +78,7 @@ def main(args, device):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Test script')
-    parser.add_argument('-cfg', metavar='FILE', type=str, default='app/configs/pspnet_efficientnet.yaml')
+    parser.add_argument('-cfg', metavar='FILE', type=str, default='app/configs/pspnet_densenet.yaml')
     args = parser.parse_args()
 
     if torch.cuda.is_available():
