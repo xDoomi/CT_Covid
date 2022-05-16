@@ -39,3 +39,16 @@ stages:
     - path: save/val_plot.png
       md5: 6f106d2cda4b320dff492475cca01f87
       size: 105512
+  evaluate_test:
+    cmd: python app/eval_test.py
+    deps:
+    - path: app/eval_test.py
+      md5: c9739d6f6b3acaec08b84abb20b3a756
+      size: 2795
+    - path: save/model
+      md5: 502fd3aec42ce09e6c2013588f3488e8
+      size: 76948488
+    outs:
+    - path: save/test_metrics.json
+      md5: e45ae85b5750a3a7667227ed23a0f235
+      size: 92
